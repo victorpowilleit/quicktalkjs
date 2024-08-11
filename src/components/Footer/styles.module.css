@@ -1,0 +1,22 @@
+.footer {
+    background-color: var(--main-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    letter-spacing: .2rem;
+
+    * {
+        color: #FFF8;
+    }
+
+    > a {
+        display: flex;
+        align-items: center;
+    }
+
+    > a span {
+        margin-left: .3rem;
+        color: goldenrod;
+        text-decoration: darkgoldenrod underline;
+    }
+}

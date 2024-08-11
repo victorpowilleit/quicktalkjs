@@ -1,0 +1,30 @@
+.messageContainer {
+    max-width: 800px;
+    width: 98dvw;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+    background-color: var(--comment-bg);
+    border: 1px solid var(--comment-outline);
+
+    > .messageFooter {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: .8rem;
+
+        svg {
+            height: 1rem;
+        }
+
+        > * {
+            display: flex;
+            align-items: center;
+        }
+
+        >.likes{
+            cursor: pointer;
+        }
+    }
+}

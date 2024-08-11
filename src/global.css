@@ -1,0 +1,74 @@
+:root{
+    --main-bg: #372E4B;
+    --header-bg: #372E4B60;
+    --background-cover: #000A;
+    --modal-bg: #563C8C;
+    --button-bg: #6533CC;
+    --comment-bg: #554D66;
+    --modal-outline: #7863A3;
+    --button-outline: #422E6B;
+    --comment-outline: #BBB8C2;
+}
+
+*{
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+    color: #FFF;
+}
+
+a, button{
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    outline: none;
+    border: none;
+    box-sizing: border-box;
+}
+
+button {
+    border: 1px solid var(--button-outline);
+    border-radius: .25rem;
+    width: fit-content;
+    transition: filter .2s ease-in;
+    &:hover{
+        filter: brightness(1.2);
+    }
+    &:active {
+        transition: filter 0s;
+        filter: brightness(.8);
+    }
+}
+
+body{
+    background: var(--main-bg) url("/images/bgTiles.jpg");
+}
+
+.App{
+    height: 100dvh;
+    width: 100dvw;
+    display: flex;
+    flex-direction: column;
+    >.content{
+        flex: 1;
+        overflow-y: scroll;
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+        align-items: center;
+    }
+}
+
+.rounded{
+    border-radius: .5rem;
+}
+
+.shadow{
+    box-shadow: 0 5px 5px #0008;
+}
+
+.shadow-soft{
+    box-shadow: 0 2px 2px #0005;
+}

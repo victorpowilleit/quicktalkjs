@@ -1,0 +1,9 @@
+.header{
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+    background: var(--header-bg);
+    backdrop-filter: blur(3px);
+    box-shadow: 0 0 6px rgb(0,0,0);
+}
+
