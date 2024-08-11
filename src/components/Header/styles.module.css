@@ -5,5 +5,19 @@
     background: var(--header-bg);
     backdrop-filter: blur(3px);
     box-shadow: 0 0 6px rgb(0,0,0);
+    >.logoutButton{
+        position: absolute;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        right: 1rem;
+        cursor: pointer;
+        &:hover{
+            opacity: .8;
+        }
+        &:active{
+            filter: brightness(30%);
+        }
+    }
 }
 

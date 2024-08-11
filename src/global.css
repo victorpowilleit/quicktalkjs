@@ -51,6 +51,10 @@ button {
         transition: filter 0s;
         filter: brightness(.8);
     }
+    &.loginButton{
+        display: flex;
+        gap: 1rem;
+    }
 }
 
 body {
