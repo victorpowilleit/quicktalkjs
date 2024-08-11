@@ -1,8 +1,13 @@
 import {useState} from "react";
 import {CircleUser, Heart} from "lucide-react";
 import styles from './styles.module.css'
+import {ChatMessagesType} from "../../App.tsx";
 
-export function ChatMessage() {
+interface ChatMessageProps {
+  message: ChatMessagesType
+}
+
+export function ChatMessage({message}:ChatMessageProps) {
   const [hasBeenLiked, setHasBeenLiked] = useState(false);
   const [likeLimiter, setLikeLimiter] = useState(false);
 
@@ -18,13 +23,13 @@ export function ChatMessage() {
 
   return (
     <div className={`${styles.messageContainer} rounded`}>
-      minha mensagem
+      {message.message}
       <div className={styles.messageFooter}>
         <div className={styles.likes} onClick={handleUserLike}>
           <Heart fill={hasBeenLiked ? "#FFF" : "none"}/>
-          {5}
+          {message.likes.length}
         </div>
-        <div className={styles.author}>Victor<CircleUser/></div>
+        <div className={styles.author}>{message.author}<CircleUser/></div>
       </div>
     </div>
   )

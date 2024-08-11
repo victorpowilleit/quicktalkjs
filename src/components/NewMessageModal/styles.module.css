@@ -1,0 +1,54 @@
+.bgCover {
+    z-index: 999;
+    position: fixed;
+    inset: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: var(--background-cover);
+    backdrop-filter: blur(3px);
+}
+
+.modalContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 480px;
+    width: 98dvw;
+    padding: 1rem;
+    background-color: var(--modal-bg);
+    border: 1px solid var(--modal-outline);
+
+    >div{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        >span{
+            display: flex;
+            align-items: center;
+            line-height: .5rem;
+            background-color: var(--button-bg);
+            padding: .4rem .4rem .6rem;
+            border-radius: .25rem;
+            border: 1px solid var(--button-outline);
+            cursor: pointer;
+            &:hover{
+                filter: brightness(1.1);
+            }
+            &:active{
+                filter: brightness(.8);
+            }
+        }
+    }
+
+    >textarea{
+        resize: vertical;
+        min-height: 8rem;
+        background-color: var(--main-bg);
+    }
+    >button{
+        align-self: center;
+    }
+}

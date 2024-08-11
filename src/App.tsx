@@ -1,10 +1,11 @@
 import {Header} from "./components/Header";
 import {ChatRoom} from "./pages/ChatRoom";
 import {Footer} from "./components/Footer";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
+import {NewMessageModal} from "./components/NewMessageModal";
 
 export type ChatMessagesType = {
-  id: number;
+  id: string;
   message: string;
   time: string;
   author: string;
@@ -17,38 +18,55 @@ export type UserType = {
   email: string;
 } | null
 
-const mockUser:UserType = {
+const mockUser: UserType = {
   id: "b8723bdqb",
   name: "Victor",
   email: "victor.powilleit@gmail.com"
 }
 
-const mockComment:ChatMessagesType = {
-  id: 1,
-  message: "Hello World!",
-  time: "09:00",
-  author: mockUser.name,
-  likes: [],
-}
-
 export function App() {
-  const [user, setUser] = useState<UserType|null>(null)
-  const [chatRoomId, setChatRoomId] = useState<string|null>(null);
+  const [user, setUser] = useState<UserType | null>(null)
+  const [chatRoomId, setChatRoomId] = useState<string | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessagesType[]>([]);
+  const [isNewMessageModalOpen, setIsNewMessageModalOpen] = useState<boolean>(false);
 
-  useEffect(() => {
-    setUser(mockUser);
-    setChatRoomId("123456789");
-    setChatMessages(prevState => [...prevState, mockComment])
-  }, []);
+  //Mock User Insertion → Dev Purposes Only
+    const effectExecuted = useRef(false)
+    useEffect(() => {
+      if (!effectExecuted.current) {
+        setUser(mockUser);
+        effectExecuted.current = true
+      }
+    }, []);
 
-  console.log(chatRoomId);
+  function handleNewMessageModalOpen() {
+    setIsNewMessageModalOpen(true);
+  }
+
+  function handleNewMessageModalClose() {
+    setIsNewMessageModalOpen(false);
+  }
+
+  function handleNewMessage(message: string) {
+    const newMessage: ChatMessagesType = {
+      id: `${Math.floor(Math.random() * 1000).toString()}`,
+      message: message,
+      time: new Date().toLocaleTimeString(),
+      author: user!.name,
+      likes: [],
+    }
+    setChatMessages(prevState => [...prevState, newMessage])
+    setIsNewMessageModalOpen(false)
+  }
 
   return (
     <div className="App">
       <Header/>
+      {isNewMessageModalOpen &&
+          <NewMessageModal closeModal={handleNewMessageModalClose} handleNewMessage={handleNewMessage}/>}
       <div className="content">
-        <ChatRoom messages={{get:chatMessages, set:setChatMessages}} user={user}/>
+        <ChatRoom messages={{get: chatMessages, set: setChatMessages}} user={user}
+                  openNewMessageModal={handleNewMessageModalOpen}/>
       </div>
       <Footer/>
     </div>

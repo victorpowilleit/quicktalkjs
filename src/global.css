@@ -1,16 +1,16 @@
-:root{
+:root {
     --main-bg: #372E4B;
     --header-bg: #372E4B60;
     --background-cover: #000A;
     --modal-bg: #563C8C;
     --button-bg: #6533CC;
-    --comment-bg: #554D66;
+    --comment-bg: #554D66E0;
     --modal-outline: #7863A3;
     --button-outline: #422E6B;
     --comment-outline: #BBB8C2;
 }
 
-*{
+* {
     font-family: 'Inter', sans-serif;
     margin: 0;
     padding: 0;
@@ -19,56 +19,69 @@
     color: #FFF;
 }
 
-a, button{
+a, button, textarea, input {
     text-decoration: none;
     color: inherit;
-    cursor: pointer;
     outline: none;
     border: none;
     box-sizing: border-box;
 }
 
+textarea, input {
+    padding: .5rem;
+}
+
+a, button {
+    cursor: pointer;
+}
+
 button {
-    border: 1px solid var(--button-outline);
-    border-radius: .25rem;
     width: fit-content;
+    border-radius: .25rem;
+    background-color: var(--button-bg);
+    border: 1px solid var(--button-outline);
     transition: filter .2s ease-in;
-    &:hover{
+    padding: .5rem 1rem;
+
+    &:hover {
         filter: brightness(1.2);
     }
+
     &:active {
         transition: filter 0s;
         filter: brightness(.8);
     }
 }
 
-body{
+body {
     background: var(--main-bg) url("/images/bgTiles.jpg");
 }
 
-.App{
+.App {
     height: 100dvh;
     width: 100dvw;
     display: flex;
     flex-direction: column;
-    >.content{
+
+    > .content {
         flex: 1;
         overflow-y: scroll;
         display: flex;
         flex-direction: column;
-        padding: 1rem;
+        gap: 2rem;
+        padding: 2rem;
         align-items: center;
     }
 }
 
-.rounded{
+.rounded {
     border-radius: .5rem;
 }
 
-.shadow{
+.shadow {
     box-shadow: 0 5px 5px #0008;
 }
 
-.shadow-soft{
+.shadow-soft {
     box-shadow: 0 2px 2px #0005;
 }
