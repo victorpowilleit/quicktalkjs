@@ -9,6 +9,7 @@ import {NewMessageModal} from "./components/NewMessageModal";
 import {KeyRound, LogIn} from "lucide-react";
 
 import {ChatMessagesType, ChatMessagesTypeWithKey, UserType} from "./@types.ts";
+import {set} from "firebase/database";
 
 export function App() {
   const [user, setUser] = useState<UserType | null>(null);
@@ -53,16 +54,22 @@ export function App() {
   async function handleLogIn() {
     const login: UserType = await signInWithGoogle()
     setUser(login)
+    window.localStorage.setItem("user", JSON.stringify(login))
   }
 
   async function handleLogOut() {
     await logOut()
     setUser(null)
+    window.localStorage.removeItem("user")
   }
 
   useEffect(() => {
     if(!isListenerConfigured.current) {
       readChatData(isListenerConfigured.current, setIsListenerConfigured, insertMessage).then()
+    }
+    const userData = window.localStorage.getItem("user")||null
+    if(userData){
+      setUser(JSON.parse(userData))
     }
   }, []);
 
