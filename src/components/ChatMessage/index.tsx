@@ -1,25 +1,54 @@
-import {useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {CircleUser, Heart} from "lucide-react";
 import styles from './styles.module.css'
-import {ChatMessagesType} from "../../App.tsx";
+import {ChatMessagesTypeWithKey, UserType} from "../../@types.ts";
+import {readLikeData, writeMessageLikes} from "../../server/firebase.ts";
 
 interface ChatMessageProps {
-  message: ChatMessagesType
+  message: ChatMessagesTypeWithKey
+  user: UserType
 }
 
-export function ChatMessage({message}:ChatMessageProps) {
+export function ChatMessage({message, user}: ChatMessageProps) {
   const [hasBeenLiked, setHasBeenLiked] = useState(false);
   const [likeLimiter, setLikeLimiter] = useState(false);
+  const [likes, setLikes] = useState<string[]>([]);
+  const isListenerConfigured = useRef(false)
 
-  function handleUserLike() {
+  function updateLikes(newLikes: string[]) {
+    setLikes(newLikes);
+  }
+
+  async function toggleLike() {
+    let actualLikes = []
+    if (likes.includes(user!.email!)) {
+      actualLikes = likes.filter(email => email !== user!.email)
+    } else {
+      actualLikes = [...likes, user!.email!]
+    }
+    await writeMessageLikes(message.key, actualLikes)
+  }
+
+  async function handleUserLike() {
     if (!likeLimiter) {
-      setHasBeenLiked(prev => !prev)
-      setLikeLimiter(true)
-      setTimeout(()=>{
+      await toggleLike()
+      setTimeout(() => {
         setLikeLimiter(false)
-      },2000)
+      }, 2000)
     }
   }
+
+  useEffect(() => {
+    if (!isListenerConfigured.current) {
+      readLikeData(message.key, updateLikes).then()
+      isListenerConfigured.current = true
+    }
+  }, []);
+
+  useEffect(() => {
+    setHasBeenLiked(likes.includes(user!.email!))
+  }, [likes]);
+
 
   return (
     <div className={`${styles.messageContainer} rounded`}>
@@ -27,7 +56,7 @@ export function ChatMessage({message}:ChatMessageProps) {
       <div className={styles.messageFooter}>
         <div className={styles.likes} onClick={handleUserLike}>
           <Heart fill={hasBeenLiked ? "#FFF" : "none"}/>
-          {message.likes.length}
+          {likes.length}
         </div>
         <div className={styles.author}>{message.author}<CircleUser/></div>
       </div>

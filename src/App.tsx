@@ -1,38 +1,24 @@
+import {useEffect, useRef, useState} from "react";
+import {logOut, readChatData, signInWithGoogle, writeChatData} from "./server/firebase.ts";
+
 import {Header} from "./components/Header";
 import {ChatRoom} from "./pages/ChatRoom";
 import {Footer} from "./components/Footer";
-import {useState} from "react";
 import {NewMessageModal} from "./components/NewMessageModal";
-import {logOut, signInWithGoogle} from "./server/firebase.ts";
+
 import {KeyRound, LogIn} from "lucide-react";
 
-export type ChatMessagesType = {
-  id: string;
-  message: string;
-  time: string;
-  author: string | null;
-  likes: string[];
-}
-
-export type UserType = {
-  token: string | undefined;
-  email: string | null;
-} | null
+import {ChatMessagesType, ChatMessagesTypeWithKey, UserType} from "./@types.ts";
 
 export function App() {
-  const [user, setUser] = useState<UserType | null>(null)
-  const [chatRoomId, setChatRoomId] = useState<string | null>(null);
-  const [chatMessages, setChatMessages] = useState<ChatMessagesType[]>([]);
+  const [user, setUser] = useState<UserType | null>(null);
+  const [chatMessages, setChatMessages] = useState<ChatMessagesTypeWithKey[]>([]);
   const [isNewMessageModalOpen, setIsNewMessageModalOpen] = useState<boolean>(false);
 
-  // //Mock User Insertion → Dev Purposes Only
-  //   const effectExecuted = useRef(false)
-  //   useEffect(() => {
-  //     if (!effectExecuted.current) {
-  //       setUser(mockUser);
-  //       effectExecuted.current = true
-  //     }
-  //   }, []);
+  const isListenerConfigured = useRef(false)
+  function setIsListenerConfigured(){
+    isListenerConfigured.current = true;
+  }
 
   function handleNewMessageModalOpen() {
     setIsNewMessageModalOpen(true);
@@ -42,16 +28,26 @@ export function App() {
     setIsNewMessageModalOpen(false);
   }
 
-  function handleNewMessage(message: string) {
+  async function handleNewMessage(message: string) {
     const newMessage: ChatMessagesType = {
-      id: `${Math.floor(Math.random() * 1000).toString()}`,
       message: message,
-      time: new Date().toLocaleTimeString(),
-      author: user!.email,
+      author: user!.email!,
       likes: [],
+      time: new Date().toLocaleTimeString(),
     }
-    setChatMessages(prevState => [...prevState, newMessage])
-    setIsNewMessageModalOpen(false)
+    const messageKey = await writeChatData(
+      newMessage.message,
+      newMessage.author,
+      newMessage.likes,
+      newMessage.time,
+    )
+    if (messageKey) {
+      setIsNewMessageModalOpen(false)
+    }
+  }
+
+  function insertMessage(data: ChatMessagesTypeWithKey){
+    setChatMessages(prevState => [...prevState, data])
   }
 
   async function handleLogIn() {
@@ -64,23 +60,29 @@ export function App() {
     setUser(null)
   }
 
+  useEffect(() => {
+    if(!isListenerConfigured.current) {
+      readChatData(isListenerConfigured.current, setIsListenerConfigured, insertMessage).then()
+    }
+  }, []);
+
   return (
     <div className="App">
-      <Header logout={handleLogOut} user={!!user?.token} />
+      <Header logout={handleLogOut} user={!!user?.token}/>
       {isNewMessageModalOpen &&
           <NewMessageModal closeModal={handleNewMessageModalClose} handleNewMessage={handleNewMessage}/>}
       <div className="content">
         {
           user?.token ?
-            <ChatRoom messages={{get: chatMessages, set: setChatMessages}} user={user}
+            <ChatRoom messages={{get: chatMessages}} user={user}
                       openNewMessageModal={handleNewMessageModalOpen}/>
             :
             <button className="loginButton shadow" onClick={handleLogIn}>
-                <KeyRound/>
+              <KeyRound/>
               <span>
                 ENTRE COM A SUA<br/>CONTA GOOGLE
               </span>
-                <LogIn/>
+              <LogIn/>
             </button>
         }
       </div>

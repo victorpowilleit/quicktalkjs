@@ -1,12 +1,10 @@
-// Import the functions you need from the SDKs you need
 import {initializeApp} from "firebase/app";
 import {getAnalytics} from "firebase/analytics";
-import {GoogleAuthProvider, getAuth, signInWithPopup, signOut} from "firebase/auth";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import {getDatabase, ref, set, push, onChildAdded, onValue, update} from "firebase/database";
+import {getAuth, GoogleAuthProvider, signInWithPopup, signOut} from "firebase/auth";
+import {ChatMessagesTypeWithKey} from "../@types.ts";
 
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -23,28 +21,77 @@ export const app = initializeApp(firebaseConfig);
 export const analytics = getAnalytics(app);
 export const provider = new GoogleAuthProvider();
 export const auth = getAuth();
+export const database = getDatabase(app);
 
+
+// LogIn & LogOut
 export async function signInWithGoogle() {
-  const loginResponse = await signInWithPopup(auth, provider)
+  return await signInWithPopup(auth, provider)
     .then((result) => {
       const credential = GoogleAuthProvider.credentialFromResult(result);
-      const token = credential.accessToken;
+      const token = credential!.accessToken;
       const user = result.user;
       return {token, email: user.email}
-      // return {status: true, token, user};
     })
     .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      const email = error.customData.email;
-      const credential = GoogleAuthProvider.credentialFromError(error);
+      console.log(error.code)
       return null
     })
-  return loginResponse
 }
 
 export async function logOut() {
   signOut(auth).then(() => {
   }).catch((error) => {
+    console.log(error)
   });
 }
+
+// DATABASE
+
+export async function writeChatData(message: string, author: string, likes: string[], time: string) {
+  const db = getDatabase();
+  const newMessageRef = await push(ref(db, 'chat/'));
+  await set(newMessageRef, {
+    key:newMessageRef.key,
+    message,
+    author,
+    likes,
+    time,
+  })
+  return newMessageRef.key
+}
+
+export async function writeMessageLikes(key: string, likes: string[]) {
+  const db = getDatabase();
+  const messageRef = ref(db, 'chat/' + key);
+  await update(messageRef, {
+    likes: likes,
+  });
+}
+
+export async function readChatData(
+  isListenerConfigured: boolean = false, setListenerConfig: () => void, setChatList: (data: ChatMessagesTypeWithKey) => void
+){
+  if (!isListenerConfigured) {
+    const db = getDatabase();
+    const chatRef = ref(db, 'chat/');
+    onChildAdded(chatRef, (snapshot) => {
+      const data = snapshot.val();
+      setChatList({
+        ...data
+      })
+    });
+    setListenerConfig()
+  }
+}
+
+export async function readLikeData(key: string, updateLikes: (likes: string[])=>void) {
+  const db = getDatabase();
+  const likesRef = ref(db, 'chat/' + key + '/likes');
+
+  onValue(likesRef, (snapshot) => {
+    const likes = snapshot.exists() ? snapshot.val() : [];
+    updateLikes(likes)
+  });
+}
+
